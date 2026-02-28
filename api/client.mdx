@@ -501,6 +501,56 @@ Registers a handler for chat state events (typing indicators).
 
 ---
 
+## Spam Reporting
+
+### send_spam_report
+
+```rust
+pub async fn send_spam_report(
+    &self,
+    request: SpamReportRequest
+) -> Result<SpamReportResult, IqError>
+```
+
+Send a spam report to WhatsApp for messages or groups.
+
+<ParamField path="request" type="SpamReportRequest" required>
+  The spam report request containing:
+  - `message_id` - ID of the message being reported
+  - `message_timestamp` - Timestamp of the message
+  - `spam_flow` - Context where report was initiated (MessageMenu, GroupInfoReport, etc.)
+  - `from_jid` - Optional sender JID
+  - `group_jid` - Optional group JID for group spam
+  - `participant_jid` - Optional participant JID in group context
+  - `raw_message` - Optional raw message bytes
+  - `media_type` - Optional media type if reporting media
+</ParamField>
+
+**Returns:** `SpamReportResult` indicating success or failure
+
+**Example:**
+
+```rust
+use whatsapp_rust::{SpamReportRequest, SpamFlow};
+
+// Report a spam message
+let result = client.send_spam_report(SpamReportRequest {
+    message_id: "MESSAGE_ID".to_string(),
+    message_timestamp: 1234567890,
+    from_jid: Some(sender_jid),
+    spam_flow: SpamFlow::MessageMenu,
+    ..Default::default()
+}).await?;
+```
+
+**SpamFlow variants:**
+- `MessageMenu` - Reported from message context menu
+- `GroupInfoReport` - Reported from group info screen
+- `GroupSpamBannerReport` - Reported from group spam banner
+- `ContactInfo` - Reported from contact info screen
+
+---
+
 ## Passive Mode
 
 ### set_passive
